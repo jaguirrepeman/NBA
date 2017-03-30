@@ -662,10 +662,10 @@ div.cavs {
                
 
             dataset = "";
-            if (player == "Kevin Durant"){dataset = "/data/durant.csv"}
-            if (player == "Stephen Curry"){dataset = "/data/curry.csv"}
-            if (player == "Klay Thompson"){dataset = "/data/klay.csv"}
-            if (player == "Draymond Green"){dataset = "/data/green.csv"}
+            if (player == "Kevin Durant"){dataset = "https://raw.githubusercontent.com/jaguirrepeman/NBA/master/data/durant.csv"}
+            if (player == "Stephen Curry"){dataset = "https://raw.githubusercontent.com/jaguirrepeman/NBA/master/data/curry.csv"}
+            if (player == "Klay Thompson"){dataset = "https://raw.githubusercontent.com/jaguirrepeman/NBA/master/data/klay.csv"}
+            if (player == "Draymond Green"){dataset = "https://raw.githubusercontent.com/jaguirrepeman/NBA/master/data/green.csv"}
             var curry_csv = d3.csv(dataset, function(player)
                 {
                     data = player.map(function(d)
