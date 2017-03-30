@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mapa de Tiros: Temporada 2016/2017</title>
+  <!--<script type="text/javascript" src="js/d3/d3.min.js"></script>-->
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="js/jquery-csv.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> 
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <!--<link rel="stylesheet" href="css/styles.css">-->
+    
+  <style>
+  .zones .zone { fill-opacity: .6; stroke:none; fill: none; }
+  .zones .zone[title="Backcourt"] { display: none; }
+  .marks.marks--advanced { fill:none; stroke:#333333; stroke-width:3px; }
+  .marks.marks--court { fill:none; stroke:#f2f2f2; stroke-width:7px; }
+  .detail__text text { font-family: "Roboto Condensed", "Helvetica Neue", "Helvetica", "san-serif"; fill:#111111; font-weight:normal; stroke:none; }
+  .shotzone__legend-item text { font-size: 18px; fill: #000000; font-family: "Roboto Condensed";}
+  .shotzone__legend-title text { font-size: 19px; fill: #000000; font-family: "Roboto Condensed";}
+
+
+  * {
+    box-sizing: border-box;
+  }
+  .text_selection {
+    font-size: 1em;
+    width: 80%; /* added this */
+    border: 1px 1px 1px 1px ;
+  }
+  #text_left {
+    text-align: left;
+    overflow:auto;
+  }
+  .image_selection {
+    text-align: center;
+    border:solid 4px #6b5221;
+    margin-right: 10px;
+  }
+  .player_container{
+   font-weight: bold;
+   border: 1px solid black;
+   margin-right: 10px;
+   margin-left: 10px;
+   overflow: auto;
+   color: #6b5221;
+ }
+
+
+img {
+    vertical-align: middle;
+    border: 0;
+}
+
+.player img {
+  width: 45px;
+  float: left;
+  height: auto;
+  position: relative;
+  top: 5px;
+}
+.player-name{
+  color: blue;
+}
+
+.player input {
+  width: 20px;
+  float: left;
+  height: auto;
+  padding: 15px 0;
+  position: relative;
+  vertical-align: middle;
+  top: 10px;
+}
+
+.player-info .name, .player-info .team-name {
+  float: left;
+  clear: both;
+}
+.player .player-info {
+  overflow: hidden;
+  position: relative;
+  top: 7px;
+  left: 7px;
+  font-size: .85em;
+}
+.player {
+  width: 57%;
+}
+
+
+.team-img {
+    text-align: center;
+    height: 50px;
+    text-align: center;
+}
+
+ .team-img img {
+    width: 40px;
+    height: 40px;
+    max-width: 100%;
+}
+
+.radio_wrap a{
+  vertical-align: middle;
+}
+
+div.table-title {
+    width: 100%;
+    height: 30px;
+    font-size: 1.3em;
+    text-align: center;
+    position: relative;
+    background-color: #1e518c;
+    color: #FFF;
+    margin-left: 0px;
+}
+
+div.player-selection-container {
+    width: 100%;
+    height: 30px;
+    position: relative;
+}
+div.team-title {
+    width: 50%;
+    height: 30px;
+    font-size: 1.15em;
+    text-align: center;
+    position: relative;
+
+}
+div.warriors {
+
+    background-color: #006BB6;
+    color: #FDB927;
+}
+div.cavs {
+  
+    background-color: #860038;
+    color: #FDBB30;
+}
+
+.player_box_warriors{
+      padding-right: 0px;
+    padding-left: 0px;
+    
+    margin-bottom: 0px;
+    margin-top: 0px;
+
+}
+.player_box_warriors:nth-child(2n) {
+
+    background: #E7F1F8;
+}
+ .player_box_warriors:nth-child(2n-1) {
+    background: #A2C9E4;
+}
+.player_box_cavs:nth-child(2n) {
+    background: #E9D0DA;
+}
+ .player_box_cavs:nth-child(2n-1) {
+    background: #B25C80;
+}
+
+
+</style>
+</head>
+<body>
+  <div class="main-container">
+    <g class="shotzone__legend-title" transform="translate(0,0)">
+      <div><text dx="13" dy="18" class="chart_title">Mapa de tiros: Temporada 2016-2017</text></div>
+
+    </g>
+    <div class="row">
+      <div class="col-sm-5 chart_container">
+
+      </div>
+
+      <div class="player-container col-sm-6">
+
+        <!-- Título de la tabla-->
+        <div class="row table-title" >
+          <div class="title">
+            <span>Selecciona un jugador</span>
+          </div>         
+        </div>
+
+        <div class="row table-title">
+            <div class="col-sm-6 col-lg-6 team-title warriors">
+              
+                <span >Golden State Warriors</span>
+              
+            </div>
+            <div class=" col-sm-6 col-lg-6 team-title cavs">
+                <span >Cleveland Cavaliers</span>
+            </div>
+        </div>
+
+        <div class="player-selection-container">
+          <div id="warriors-container" class="col-lg-6 col-sm-6 leaders-list">
+
+            <!-- Player 1 -->
+            <div class="row player_box_warriors">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="Kevin Durant"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/durant.png"></a>
+                <div class="player-info">
+                  <span class="player-name">Kevin Durant</span>
+                  <span class="team-name"> <span>35</span> A / GSW </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/warriors.svg"></a>
+              </div>
+            </div><!-- Fin Player -->
+
+            <!-- Player 2: Steph -->
+            <div class="row player_box_warriors">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="Stephen Curry"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/curry.png"></a>
+                <div class="player-info">
+                  <span class="player-name">Stephen Curry</span>
+                  <span class="team-name"> <span>30</span> B / GSW </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/warriors.svg"></a>
+              </div>
+            </div><!-- Fin Player -->
+            <!-- Player 3: Klay -->
+            <div class="row player_box_warriors">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="Klay Thompson"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/klay.png"></a>
+                <div class="player-info">
+                  <span class="player-name">Klay Thompson</span>
+                  <span class="team-name"> <span>11</span> E / GSW </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/warriors.svg"></a>
+              </div>
+            </div><!-- Fin Player -->
+
+            <!-- Player 4: Dray Green -->
+            <div class="row player_box_warriors">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="Draymond Green"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/draymond.png"></a>
+                <div class="player-info">
+                  <span class="player-name">Draymond Green</span>
+                  <span class="team-name"> <span>23</span> AP / GSW </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/warriors.svg"></a>
+              </div>
+            </div><!-- Fin Player -->
+          </div><!-- Fin Jugadores Warriors -->
+
+          <div class="col-lg-6 col-sm-6 leaders-list">
+            
+            <!-- Player 1 -->
+            <div class="row player_box_cavs">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="LeBron James"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/lebron.png"></a>
+                <div class="player-info">
+                  <span class="player-name">LeBron James</span>
+                  <span class="team-name"> <span>23</span> A / CLE </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/cavs.svg"></a>
+              </div>
+            </div><!-- Fin Player -->
+
+            <div class="row player_box_cavs">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="Kyrie Irving"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/kyrie.png"></a>
+                <div class="player-info">
+                  <span class="player-name">Kyrie Irving</span>
+                  <span class="team-name"> <span>2</span> B / CLE </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/cavs.svg"></a>
+              </div>
+            </div><!-- Fin Player -->
+
+            <div class="row player_box_cavs">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="Kevin Love"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/love.png"></a>
+                <div class="player-info">
+                  <span class="player-name">Kevin Love</span>
+                  <span class="team-name"> <span>0</span> AP / CLE </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/cavs.svg"></a>
+              </div>
+            </div><!-- Fin Player -->
+
+            <div class="row player_box_cavs">
+              <div class="col-lg-3 col-sm-3 col-4 player">
+                <div class="radio_wrap">
+                  <input type="radio" name="gsw_player" value="JR Smith"/>    
+                </div>
+                <a><img class="player-img-small" alt="undefined" src="media/jr.png"></a>
+                <div class="player-info">
+                  <span class="player-name">JR Smith</span>
+                  <span class="team-name"> <span>5</span> E / CLE </span>
+                </div>
+              </div>
+              <div class="col-2 team-img">
+                <a><img src="media/cavs.svg"></a>
+              </div>
+            </div><!-- Fin Player -->  
+          </div><!-- Fin Jugadores Cavs -->
+        </div>
+      </div>
+
+      <script type="text/javascript">
+
+        var chart_container = d3.select("body").selectAll(".chart_container")
+        var body = d3.select("body")
+        
+
+        var svg = chart_container.append("svg").attr("version", "1.1")
+        .attr("xmlns", "http://www.w3.org/2000/svg")
+        .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+        .attr("width", "1000")
+        .attr("height", "400")
+        .attr("viewBox", "0 0 620 610")
+        .attr("preserveAspectRatio", "xMinYMin")
+        .attr("class", "stats-shotzone__svg")
+
+        var svg_g = svg.append("g").attr("class", "marks marks--advanced")
+        svg_g.append("path").attr("d", "M220,4A96,96,0,1,0,380,4")
+        svg_g.append("path").attr("d", "M250,140L203,224")
+        svg_g.append("path").attr("d", "M350,140L394,224")
+        svg_g.append("path").attr("d", "M147,173L68,226")
+        svg_g.append("path").attr("d", "M241,240L214,333")
+        svg_g.append("path").attr("d", "M359,240L386,333")
+        svg_g.append("path").attr("d", "M453,173L532,226")
+        svg_g.append("path").attr("d", "M210,332L150,564")
+        svg_g.append("path").attr("d", "M390,332L450,564")
+
+        svg.append("image").attr("width", "604").attr("height", "568").attr("href", "media/shotchart_court.png")
+        
+        var court_container =  svg.append("g").attr("class", "court-container")
+        //1 - Back Court(BC) | Back Court Shot
+        court_container.append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_1")
+        .attr("d", "M0,0")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //2 - advanced_Center(C) | 16-24 ft.
+        court_container.append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_2")
+        .attr("d", "M241,240A192,192,0,0,0,359,240L386,333A285,285,0,0,1,214,333Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //3 - advanced_Center(C) | 24+ ft.
+       court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_3")
+        .attr("d", "M210,332A285,285,0,0,0,390,332L450,564H150Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //4 - advanced_Center(C) | 8-16 ft.
+       court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_4")
+        .attr("d", "M250,140A96,96,0,0,0,350,140L394,224A192,192,0,0,1,203,224Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //5 - advanced_Center(C) | Less Than 8 ft.
+       court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_5")
+        .attr("d", "M220,3A96,96,0,1,0,380,3Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //6 - advanced_Left Side Center(LC) | 16-24 ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_6")
+        .attr("d", "M147,173A192,192,0,0,0,241,240L214,333A285,285,0,0,1,68,226Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //7 - advanced_Left Side Center(LC) | 24+ ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_7")
+        .attr("d", "M0,168H36A285,285,0,0,0,210,332L150,564H0Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //8 - advanced_Left Side(L) | 16-24 ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_8")
+        .attr("d", "M36,0V168A285,285,0,0,0,68,226L147,173A192,192,0,0,1,117,0Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //9 - advanced_Left Side(L) | 24+ ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_9")
+        .attr("d", "M0,0H36V168H0Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //10 - advanced_Left Side(L) | 8-16 ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_10")
+        .attr("d", "M117,0H220A96,96,0,0,0,250,140L203,224A192,192,0,0,1,117,0Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //11 - advanced_Right Side Center(RC) | 16-24 ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_11")
+        .attr("d", "M359,240A192,192,0,0,0,453,173L532,226A285,285,0,0,1,386,333Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+ 
+        //12 - advanced_Right Side Center(RC) | 24+ ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_12")
+        .attr("d", "M564,168A285,285,0,0,1,390,332L450,564H600V168Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //13 - advanced_Right Side(R) | 16-24 ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_13")
+        .attr("d", "M564,0V168A285,285,0,0,1,532,226L453,173A192,192,0,0,0,483,0Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //14 - advanced_Right Side(R) | 24+ ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_14")
+        .attr("d", "M564,0H600V168H564Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+
+        //15 - advanced_Right_Side(R)_8-16_ft.
+        court_container.append("g")
+        .append("path")
+        .attr("class", "zone")
+        .attr("id", "zone_15")
+        .attr("d", "M483,0H380A96,96,0,0,1,350,140L397,224A192,192,0,0,0,483,0Z")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)   
+
+
+        var data_container =  svg.append("g").attr("class", "data-container").attr("id", "data_container")
+
+        //1
+        var g = data_container.append("g").attr("transform", "translate(300, 515)").attr("id", "detail_1")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+
+        g = data_container.append("g").attr("transform", "translate(300, 280)").attr("id", "detail_2")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+
+        g = data_container.append("g").attr("transform", "translate(300, 390)").attr("id", "detail_3")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(300, 180)").attr("id", "detail_4")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(300, 50)").attr("id", "detail_5")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(155, 235)").attr("id", "detail_6")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(70, 390)").attr("id", "detail_7")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(80, 130)").attr("id", "detail_8")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(35, 50)").attr("id", "detail_9")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(155, 50)").attr("id", "detail_10")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+                
+        g = data_container.append("g").attr("transform", "translate(440, 235)").attr("id", "detail_11")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(530, 390)").attr("id", "detail_12")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(520, 130)").attr("id", "detail_13")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(565, 50)").attr("id", "detail_14")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+        g = data_container.append("g").attr("transform", "translate(440, 50)").attr("id", "detail_15")
+        g.append("rect").attr("x", "-50").attr("y", "-20").attr("width", "100").attr("height", "75").attr("rx", "3").attr("ry", "3").attr("fill", "#ffffff").attr("fill-opacity", ".5")
+        g.append("text").attr("text-anchor", "middle").attr("font-size", "22px").attr("class", "shots_made_tried")
+        g.append("text").attr("dy", "20").attr("text-anchor", "middle").attr("font-size", "16px").attr("class", "shots_perc")
+        g.append("text").attr("dy", "35").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "league_avg")
+        g.append("text").attr("dy", "50").attr("text-anchor", "middle").attr("font-size", "15px").attr("class", "shots_dist")
+        
+
+        
+          function changeData(player){
+            var update_chart = function(data){
+                var data_shots_perc_string = data[0];
+                var data_shots_perc = data[1];
+                var data_league_avg = data[3];
+                var data_shots_distr = data[2];
+
+                var shots_perc = d3.selectAll(".shots_made_tried").data(data_shots_perc_string);
+                d3.selectAll(".shots_made_tried").transition().duration(1000).text(function(d, i) {return d;});
+                          
+                var data_shots_perc_string = data_shots_perc.map(function (e, i){
+                return [String(data_shots_perc[i]) + "%"];
+                });
+
+                var shots_perc = d3.selectAll(".shots_perc").data(data_shots_perc_string)
+                .transition().duration(1000).text(function(d, i) {return d;});
+                
+                var league_avg_string = data_league_avg.map(function (e,i) {
+                return "LA " + String(data_league_avg[i]) + "%";
+                })
+                d3.selectAll(".league_avg").data(league_avg_string).transition().duration(1000).text(function(d, i) {return d;});
+                
+                var shots_dist_string = data_shots_distr.map(function (e,i) {
+                return "DST " + String(data_shots_distr[i]) + "%";
+                })
+                var shots_dist = d3.selectAll(".shots_dist").data(shots_dist_string).text(function(d, i) {return d;});
+                var above = d3.selectAll(".zone").data(data_shots_perc).transition()  // Transition from old to new
+                        .duration(1000)  // Length of animation
+                        .text(function(d, i) {return d;})
+                        .style("fill", function(d, i) {
+                
+                        if (Number(data_shots_perc[i]) > Number(data_league_avg[i])) {
+                          return "#1a9641";
+                        } 
+                        else if (Math.abs(Number(data_league_avg[i]) - Number(data_shots_perc[i])) <= 1.5){
+                          return "#ffac00";
+                        }
+                        else {
+                          return "#d7191c";
+                        }
+                      });
+                court_container.selectAll("zone")
+                .on("mouseover", handleMouseOver)
+                .on("mouseout", handleMouseOut)
+
+            }
+
+            
+               
+
+            dataset = "";
+            if (player == "Kevin Durant"){dataset = "/data/durant.csv"}
+            if (player == "Stephen Curry"){dataset = "/data/curry.csv"}
+            if (player == "Klay Thompson"){dataset = "/data/klay.csv"}
+            if (player == "Draymond Green"){dataset = "/data/green.csv"}
+            var curry_csv = d3.csv(dataset, function(player)
+                {
+                    data = player.map(function(d)
+                    {
+                        arr = Object.keys(d).map(function(k) {return d[k] });
+                        //Con shift nos pulimos el nombre de la fila
+                        arr.shift();
+                        return arr;
+                    })
+                    update_chart(data);
+                return data;
+                });
+            
+          }
+          function getZoneDescr(text_id){
+              var ret = ""
+              if(text_id == "#detail_1")
+                ret = "Tiro desde medio campo"
+              if(text_id == "#detail_2")
+                ret = "Zona Central: 16-24 ft."
+              if(text_id == "#detail_3")
+                ret = "Zona Central: 24+ ft."
+              if(text_id == "#detail_4")
+                ret = "Zona Central: Menos de 8 ft."
+              if(text_id == "#detail_5")
+                ret = "Zona Central Izquierda: 16-24 ft."
+              if(text_id == "#detail_6")
+                ret = "Zona Central Izquierda: 24+ ft."
+              if(text_id == "#detail_7")
+                ret = "Zona Izquierda: 16-24 ft."
+              if(text_id == "#detail_8")
+                ret = "Zona Izquierda: 24+ ft."
+              if(text_id == "#detail_9")
+                ret = "Zona Izquierda: 8-16 ft."
+              if(text_id == "#detail_10")
+                ret = "Zona Central Derecha: 16-24 ft."
+              if(text_id == "#detail_11")
+                ret = "Zona Central Derecha: 24+ ft."
+              if(text_id == "#detail_12")
+                ret = "Zona Izquierda: 24+ ft."
+              if(text_id == "#detail_13")
+                ret = "Zona Derecha: 16-24 ft."
+              if(text_id == "#detail_14")
+                ret = "Zona Derecha: 24+ ft."
+              if(text_id == "#detail_15")
+                ret = "Zona Derecha: 8-16+ ft."
+              return(ret)
+          }
+          function handleMouseOver(d, i) {  // Add interactivity
+            
+            var id = this.id
+            var text_id = id.replace("zone", "detail")
+            var sharp = "#"
+            text_id = sharp.concat(text_id)
+            var text = d3.select(text_id)
+            d3.select(text_id).remove()
+            
+            var color = d3.rgb(d3.select(this).style("fill"))
+            var color_hex = ""
+            if (color.r == 215 && color.g == 25 && color.b == 28){
+              d3.select(this).style("fill", "#FF0000") //0F8100
+              color_hex = "#d7191c"
+            }else if (color.r == 255 && color.g == 172 && color.b == 0){
+              d3.select(this).style("fill", "#FF8000")
+              color_hex = "#ffac00"
+            }else if (color.r == 26 && color.g == 150 && color.b == 65){
+              d3.select(this).style("fill", "#00FF00")
+              color_hex = "#1a9641"
+            }
+            text_to_keep = text
+
+
+
+            var smt = text.node().childNodes[1].innerHTML
+            var sp = text.node().childNodes[2].innerHTML
+            var la = text.node().childNodes[3].innerHTML
+            var sd = text.node().childNodes[4].innerHTML
+            var zone_descr = getZoneDescr(text_id)
+
+            main_container = d3.selectAll(".main-container")
+            
+            var ext_info = main_container.append("div").attr("class", "row removable")
+            .append("div").attr("class", "col-sm-5")
+            .append("svg").attr("version", "1.1")
+            .attr("xmlns", "http://www.w3.org/2000/svg")
+            .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+            .attr("width", "400")
+            .attr("height", "150")
+            .attr("preserveAspectRatio", "xMinYMin")
+            .attr("class", "stats-shotzone__svg")
+            .append("g")
+            .attr("transform", "translate(0, 0)")
+            
+            
+            ext_info.append("rect")//.attr("x", "-80").attr("y", "-30")
+            .attr("width", "400").attr("height", "150").attr("rx", "10").attr("ry", "10").attr("fill", color_hex).attr("fill-opacity", "1")
+            ext_info.append("text").attr("dx", "60").attr("dy", "30").attr("text-anchor", "left").attr("font-size", "25px").text(zone_descr)
+            ext_info.append("text").attr("dx", "60").attr("dy", "60").attr("text-anchor", "left").attr("font-size", "16px").text(smt.split("/")[1].concat(" tiros intentados"))
+            ext_info.append("text").attr("dx", "60").attr("dy", "80").attr("text-anchor", "left").attr("font-size", "16px").text(smt.split("/")[0].concat(" tiros anotados"))
+            ext_info.append("text").attr("dx", "60").attr("dy", "100").attr("text-anchor", "left").attr("font-size", "16px").text(sp.concat(" de acierto"))
+            ext_info.append("text").attr("dx", "60").attr("dy", "120").attr("text-anchor", "left").attr("font-size", "15px").text("La media de acierto de la liga es " + la.split(" ")[1])
+            ext_info.append("text").attr("dx", "60").attr("dy", "140").attr("text-anchor", "left").attr("font-size", "15px").text("Esta zona representa un " + sd.split(" ")[1] + " del total de tiros")
+            
+          }
+          var text_to_keep;
+          function handleMouseOut(d, i) {
+            // Use D3 to select element, change color back to normal
+            console.log("WEBA OUT")
+            var color = d3.rgb(d3.select(this).style("fill"))
+            if (color.r == 255 && color.g == 0 && color.b == 0)
+              d3.select(this).style("fill", "#d7191c") //0F8100
+            else if (color.r == 255 && color.g == 128 && color.b == 0)
+              d3.select(this).style("fill", "#ffac00")
+            else if (color.r == 0 && color.g == 255 && color.b == 0)
+              d3.select(this).style("fill", "#1a9641")
+            
+            data_cont = d3.select("#data_container")
+            data_cont.node().appendChild(text_to_keep.node())
+            console.log(d3.select("#hover_text"))
+            d3.selectAll("#hover_text").remove()
+            d3.selectAll(".removable").remove()
+
+          }
+          var lastSelected;
+          $(function () {
+              //if you have any radio selected by default
+              $('[name="gsw_player"]:checked').addClass('selected');
+          });
+
+          $(document).on('click', '[name="gsw_player"]', function () {
+              $(this).addClass('selected');
+              if ($(this).hasClass('selected')) {
+                  var $selected = $('.selected[name="gsw_player"]');
+                  console.log($selected.val())
+                  if ($selected.length != 0){
+                      //alert("radio box with value " + $selected.val() + " was deselected");
+                      changeData($selected.val())
+                      $selected.removeClass('selected');
+                  }
+              }
+              
+          });
+
+      </script>
+
+    </div> <!-- Fin de la fila que forma la página-->
+   </div>
+</body>
+</html>
+
